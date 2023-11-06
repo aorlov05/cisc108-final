@@ -12,6 +12,6 @@ We envision our game to be similar to that of Whack-A-Mole, where an object will
 1 of 9 holes, and the user will have to wack it. After a certain amount of "whacks", the moles will start
 to appear more rapidly and in greater succession, as te SCALE of the speed increases throughout the game.
 
--[]
--[]
--[]
+-[] Phase 1 goal
+-[] Phase 2 goal
+-[] Phase 3 goal
