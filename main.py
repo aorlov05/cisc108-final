@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from designer import *
+import random
 
 
 # Constants which represent the ground height and position
@@ -17,6 +18,7 @@ class Player:
 class World:
     ground: DesignerObject
     player: Player
+    moles: DesignerObject
 
 
 def create_world() -> World:
@@ -46,6 +48,12 @@ def create_player() -> Player:
     cannon.y = wheel.y - cannon.height
     return Player(cannon, wheel)
 
+
+def create_moles() -> DesignerObject:
+    moles = emoji("🐀")
+    set_x = (moles, random_x)
+    set_y = (moles, random_y)
+    return moles
 
 when('starting', create_world)
 start()
