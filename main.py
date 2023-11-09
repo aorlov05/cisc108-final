@@ -55,5 +55,8 @@ def create_moles() -> DesignerObject:
     set_y = (moles, random_y)
     return moles
 
+def moles_dissapear() 
+
 when('starting', create_world)
+when("updating", create_moles)
 start()
