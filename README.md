@@ -5,15 +5,15 @@ We envision our game to be similar to that of Whack-A-Mole, where an object will
 ## Roadmap
 
 #### Phase 1
-- [x] The moles appear on the screen in random places.
+- [ ] The moles appear on the screen in random places.
 - [ ] There is a 10% chance that a new mole is mini, or half its size
 - [ ] There is a 10% chance that a new mole is a good rabbit
 - [ ] The player has 3 lives
 - [ ] The world has an infinite number of levels
-- [x] The player is on the ground and can move left and right
+- [ ] The player is on the ground and can move left and right
 - [ ] Ammo spawns on the ground
 - [ ] The player can pick up the ammo by running into it
-- [x] The player cannot move off the screen
+- [ ] The player cannot move off the screen
 
 #### Phase 2
 - [ ] The user clicks on the screen to shoot a bullet in the direction of the cursor

@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from designer import *
-import random
-from random import randomint
+
 
 # Constants which represent the ground height and position
 HEIGHT_OF_GROUND = 100
@@ -12,13 +11,14 @@ TOP_OF_GROUND_Y = get_height() - HEIGHT_OF_GROUND
 class Player:
     cannon: DesignerObject
     wheel: DesignerObject
+    left: bool
+    right: bool
 
 
 @dataclass
 class World:
     ground: DesignerObject
     player: Player
-    moles: list[DesignerObject]
 
 
 def create_world() -> World:
@@ -46,31 +46,67 @@ def create_player() -> Player:
     wheel = image("./wheel.png", anchor="midbottom")
     wheel.y = TOP_OF_GROUND_Y
     cannon.y = wheel.y - cannon.height
-    return Player(cannon, wheel)
+    return Player(cannon, wheel, False, False)
 
 
-def create_moles() -> DesignerObject:
-    moles = emoji("🐀")
-    set_x = (moles, random_x)
-    set_y = (moles, random_y)
-    return World(moles)
+def move_player(player: Player, pixels: int):
+    """
+    Moves the player the specified number of pixels
 
-def make_moles(world: World):
-    not_too_many_moles = len(world.moles) < 2
-    random_chance = randint(1, 100) == 2
-    if not_too_many_moles and random_chance:
-        world.moles.append(create_moles())
+    Args:
+        player (Player): The player object
+        pixels (int): The number of pixels to move the player
+    """
+    player.cannon.x += pixels
+    player.wheel.x += pixels
 
-def moles_dissapear(world:World):
-    kept = []
-    for mole in world.moles:
-        if "moles survived for longer then 10 seconds?":
-            kept.append(mole)
-        else:
-            destroy(mole)
-    world.moles = kept
+
+def update_player_position(world: World):
+    """
+    If the player is moving left, move the player position and
+    rotate the player wheel towards the corresponding direction
+
+    Args:
+        world (World): The world instance
+    """
+    if world.player.left:
+        move_player(world.player, -5)
+        turn_left(world.player.wheel, 5)
+    elif world.player.right:
+        move_player(world.player, 5)
+        turn_right(world.player.wheel, 5)
+
+
+def on_key_press_move_player(world: World, key: str):
+    """
+    Moves the player left when holding a, moves them right when holding d
+
+    Args:
+        world (World): The world instance
+        key (str): The key the user presses
+    """
+    if key == "a":
+        world.player.left = True
+    elif key == "d":
+        world.player.right = True
+
+
+def on_key_release_stop_player(world: World, key: str):
+    """
+    Stops moving the player left when holding a, moves them right when holding d
+
+    Args:
+        world (World): The world instance
+        key (str): The key the user presses
+    """
+    if key == "a":
+        world.player.left = False
+    elif key == "d":
+        world.player.right = False
+
 
 when('starting', create_world)
-when("updating", make_moles)
-when("updating", moles_dissapear)
+when('typing', on_key_press_move_player)
+when('done typing', on_key_release_stop_player)
+when('updating', update_player_position)
 start()
