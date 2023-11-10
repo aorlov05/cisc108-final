@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from designer import *
 import random
-
+from random import randomint
 
 # Constants which represent the ground height and position
 HEIGHT_OF_GROUND = 100
@@ -18,7 +18,7 @@ class Player:
 class World:
     ground: DesignerObject
     player: Player
-    moles: DesignerObject
+    moles: list[DesignerObject]
 
 
 def create_world() -> World:
@@ -53,10 +53,24 @@ def create_moles() -> DesignerObject:
     moles = emoji("🐀")
     set_x = (moles, random_x)
     set_y = (moles, random_y)
-    return moles
+    return World(moles)
 
-def moles_dissapear() 
+def make_moles(world: World):
+    not_too_many_moles = len(world.moles) < 2
+    random_chance = randint(1, 100) == 2
+    if not_too_many_moles and random_chance:
+        world.moles.append(create_moles())
+
+def moles_dissapear(world:World):
+    kept = []
+    for mole in world.moles:
+        if "moles survived for longer then 10 seconds?":
+            kept.append(mole)
+        else:
+            destroy(mole)
+    world.moles = kept
 
 when('starting', create_world)
-when("updating", create_moles)
+when("updating", make_moles)
+when("updating", moles_dissapear)
 start()
