@@ -21,6 +21,7 @@ class World:
     ground: DesignerObject
     player: Player
     moles: list[DesignerObject]
+    lives: DesignerObject
 
 
 def create_world() -> World:
@@ -107,24 +108,50 @@ def on_key_release_stop_player(world: World, key: str):
         world.player.right = False
 
 def create_moles() -> DesignerObject:
+    """
+    Makes the moles that the player is trying to shoot appear randomly
+
+    Returns:
+        A picture (emoji) of a mole that is the players target
+    """
     moles = emoji("🐀")
     moles.x = randint(1, get_width())
     moles.y = randint(1, get_height())
     return moles
 
 def make_moles(world: World):
+    """
+    This determines when a new mole should appear on screen, so they aren't constantly appearing
+    Args:
+        world (World): The world instance
+    """
     not_too_many_moles = len(world.moles) < 2
     random_chance = randint(1, 100) == 2
     if not_too_many_moles and random_chance:
         world.moles.append(create_moles())
 def destroy_moles(world: World):
+    """
+    Gets rid of the moles after an amount of time if they are not shot by the player
+    Args:
+        world (World): The world instance
+    """
     kept = []
     for mole in world.moles:
-       # if :
+        if mole.scale_x>10:
             kept.append(mole)
         else:
             destroy(mole)
     world.moles = kept
+
+def three_lives() -> DesignerObject:
+    """
+    the user starts with 3 lives represented by the three heart emojis
+    Returns:
+        three hearts representing the lives
+    """
+    lives = emoji("❤️❤️❤️")
+    return World(lives)
+
 
 when("updating", make_moles)
 when("updating", destroy_moles)
@@ -132,4 +159,5 @@ when('starting', create_world)
 when('typing', on_key_press_move_player)
 when('done typing', on_key_release_stop_player)
 when('updating', update_player_position)
+when("starting", three_lives)
 start()
