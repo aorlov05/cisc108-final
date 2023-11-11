@@ -143,14 +143,17 @@ def destroy_moles(world: World):
             destroy(mole)
     world.moles = kept
 
-def three_lives() -> DesignerObject:
+
+def stop_player(world: World):
     """
-    the user starts with 3 lives represented by the three heart emojis
-    Returns:
-        three hearts representing the lives
+    Stops the player from going beyond the bounds of the screen by using the boundaries of the world
+    Args:
+        world (World): the world instance
     """
-    lives = emoji("❤️❤️❤️")
-    return World(lives)
+    if world.player.x > get_width():
+        world.player.left = False
+    elif world.player.x < 0:
+        world.player.right = False
 
 
 when("updating", make_moles)
@@ -159,5 +162,5 @@ when('starting', create_world)
 when('typing', on_key_press_move_player)
 when('done typing', on_key_release_stop_player)
 when('updating', update_player_position)
-when("starting", three_lives)
+when("updating", stop_player)
 start()
