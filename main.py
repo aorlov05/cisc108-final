@@ -23,6 +23,7 @@ class World:
     moles: list[DesignerObject]
     lives_count: int
     lives: DesignerObject
+    ammo: list[DesignerObject]
 
 
 def create_world() -> World:
@@ -36,7 +37,7 @@ def create_world() -> World:
                        TOP_OF_GROUND_Y, anchor='topleft')
     player = create_player()
     lives = create_lives()
-    return World(ground, player, [], 3, lives)
+    return World(ground, player, [], 3, lives, [])
 
 
 def create_player() -> Player:
@@ -175,8 +176,33 @@ def update_lives(world: World):
     """
     world.lives.text = "Lives: " + str(world.lives_count)
 
+def create_ammo() -> DesignerObject:
+    """
+    Makes the ammo that the player is shooting appear randomly on the ground
+
+    Returns:
+        A picture (emoji) of ammo that the  player picks up
+    """
+    new_ammo = image("https://www.clker.com//cliparts/K/Z/z/u/k/7/cannon-balls-hi.png", anchor = "midbottom")
+    new_ammo.scale_x = .1
+    new_ammo.scale_y = .1
+    new_ammo.x = randint(1, get_width())
+    new_ammo.y = TOP_OF_GROUND_Y
+    return new_ammo
+
+def make_ammo(world: World):
+    """
+    This determines when more ammo should appear on screen, so they aren't constantly appearing
+    Args:
+        world (World): The world instance
+    """
+    not_too_much_ammo = len(world.ammo) < 2
+    random_chance = randint(1, 100) == 2
+    if not_too_much_ammo and random_chance:
+        world.ammo.append(create_ammo())
 
 when("updating", make_moles)
+when("updating", make_ammo)
 when("updating", destroy_moles)
 when('starting', create_world)
 when('typing', on_key_press_move_player)
