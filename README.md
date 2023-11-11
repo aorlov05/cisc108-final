@@ -2,20 +2,28 @@
 
 We envision our game to be similar to that of Whack-A-Mole, where an object will randomly appear on the screen, and the user will have to wack it. We plan on adding some variety in the type, size and overall gameplay of the moles as well. After a certain amount of "whacks", the moles will start to appear more rapidly and in greater succession, as the SCALE of the speed that the moles appear increases throughout the game.
 
+
+## Authors
+
+- Andrew Orlov, <aorlov@udel.edu>
+- Brandon Scrimenti, <bscrim@udel.edu>
+
+
 ## Roadmap
 
 #### Phase 1
-- [ ] The moles appear on the screen in random places.
-- [ ] There is a 10% chance that a new mole is mini, or half its size
-- [ ] There is a 10% chance that a new mole is a good rabbit
-- [ ] The player has 3 lives
-- [ ] The world has an infinite number of levels
-- [ ] The player is on the ground and can move left and right
-- [ ] Ammo spawns on the ground
-- [ ] The player can pick up the ammo by running into it
-- [ ] The player cannot move off the screen
+Video Showcase: https://youtu.be/aO3bL7Ei3qo
+- [x] The moles appear on the screen in random places.
+- [x] There is a 10% chance that a new mole is mini, or half its size
+- [x] There is a 10% chance that a new mole is a good rabbit
+- [x] The player has 3 lives
+- [x] The world has an infinite number of levels
+- [x] The player is on the ground and can move left and right
+- [x] Ammo spawns on the ground
+- [x] The player cannot move off the screen
 
 #### Phase 2
+- [ ] The player can pick up the ammo by running into it
 - [ ] The user clicks on the screen to shoot a bullet in the direction of the cursor
 - [ ] Every 10 moles that the player shoots, the level increases
 - [ ] Every level increase, the moles spawn and disappear faster
@@ -34,8 +42,3 @@ We envision our game to be similar to that of Whack-A-Mole, where an object will
 #### Bonus
 - [ ] Boss moles spawn in, which can have multiple lives
 - [ ] Power ups to shoot faster or run faster temporarily
-
-## Authors
-
-- Andrew Orlov, <aorlov@udel.edu>
-- Brandon Scrimenti, <bscrim@udel.edu>
