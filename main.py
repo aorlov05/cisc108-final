@@ -21,6 +21,7 @@ class World:
     ground: DesignerObject
     player: Player
     moles: list[DesignerObject]
+    lives_count: int
     lives: DesignerObject
 
 
@@ -34,7 +35,8 @@ def create_world() -> World:
     ground = Rectangle('green', get_width(), HEIGHT_OF_GROUND, 0,
                        TOP_OF_GROUND_Y, anchor='topleft')
     player = create_player()
-    return World(ground, player)
+    lives = create_lives()
+    return World(ground, player, [], 3, lives)
 
 
 def create_player() -> Player:
@@ -107,6 +109,7 @@ def on_key_release_stop_player(world: World, key: str):
     elif key == "d":
         world.player.right = False
 
+
 def create_moles() -> DesignerObject:
     """
     Makes the moles that the player is trying to shoot appear randomly
@@ -114,10 +117,11 @@ def create_moles() -> DesignerObject:
     Returns:
         A picture (emoji) of a mole that is the players target
     """
-    moles = emoji("🐀")
-    moles.x = randint(1, get_width())
-    moles.y = randint(1, get_height())
-    return moles
+    new_mole = emoji("🐀")
+    new_mole.x = randint(1, get_width())
+    new_mole.y = randint(1, TOP_OF_GROUND_Y)
+    return new_mole
+
 
 def make_moles(world: World):
     """
@@ -129,28 +133,36 @@ def make_moles(world: World):
     random_chance = randint(1, 100) == 2
     if not_too_many_moles and random_chance:
         world.moles.append(create_moles())
+
+
 def destroy_moles(world: World):
     """
     Gets rid of the moles after an amount of time if they are not shot by the player
     Args:
         world (World): The world instance
     """
-    kept = []
-    for mole in world.moles:
-        if mole.scale_x>10:
-            kept.append(mole)
-        else:
-            destroy(mole)
-    world.moles = kept
+    pass
 
-def three_lives() -> DesignerObject:
+
+def create_lives() -> DesignerObject:
     """
     the user starts with 3 lives represented by the three heart emojis
     Returns:
         three hearts representing the lives
     """
-    lives = emoji("❤️❤️❤️")
-    return World(lives)
+    lives = text("red", "Lives: 3", 40, anchor="topleft")
+    lives.x = 5  # Some margin so that the text doesn't hug the corner
+    lives.y = 5
+    return lives
+
+
+def update_lives(world: World):
+    """
+    the user starts with 3 lives represented by the three heart emojis
+    Returns:
+        three hearts representing the lives
+    """
+    world.lives.text = "Lives: " + str(world.lives_count)
 
 
 when("updating", make_moles)
@@ -159,5 +171,5 @@ when('starting', create_world)
 when('typing', on_key_press_move_player)
 when('done typing', on_key_release_stop_player)
 when('updating', update_player_position)
-when("starting", three_lives)
+when("updating", update_lives)
 start()
