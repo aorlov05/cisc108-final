@@ -17,10 +17,17 @@ class Player:
 
 
 @dataclass
+class Mole:
+    mole_img: DesignerObject
+    is_mini: bool
+    is_rabbit: bool
+
+
+@dataclass
 class World:
     ground: DesignerObject
     player: Player
-    moles: list[DesignerObject]
+    moles: list[Mole]
     lives_count: int
     lives: DesignerObject
 
@@ -110,16 +117,22 @@ def on_key_release_stop_player(world: World, key: str):
         world.player.right = False
 
 
-def create_moles() -> DesignerObject:
+def create_mole(is_mini: bool, is_rabbit: bool) -> DesignerObject:
     """
     Makes the moles that the player is trying to shoot appear randomly
 
     Returns:
         A picture (emoji) of a mole that is the players target
     """
-    new_mole = emoji("🐀")
+    if is_rabbit:
+        new_mole = emoji("🐇")
+    else:
+        new_mole = emoji("🐀")
     new_mole.x = randint(1, get_width())
     new_mole.y = randint(1, TOP_OF_GROUND_Y)
+    if is_mini:
+        new_mole.scale_x = 0.5
+        new_mole.scale_y = 0.5
     return new_mole
 
 
@@ -130,9 +143,19 @@ def make_moles(world: World):
         world (World): The world instance
     """
     not_too_many_moles = len(world.moles) < 2
-    random_chance = randint(1, 100) == 2
-    if not_too_many_moles and random_chance:
-        world.moles.append(create_moles())
+    random_spawn_chance = randint(1, 100) == 2
+    if not_too_many_moles and random_spawn_chance:
+        # Adds a 10% chance for the mole to be small, or 10% for it to be a rabbit
+        random_type_chance = randint(0, 10)
+        is_mini = False
+        is_rabbit = False
+        if random_type_chance == 1:
+            is_mini = True
+        elif random_type_chance == 2:
+            is_rabbit = True
+        mole_img = create_mole(is_mini, is_rabbit)
+        new_mole = Mole(mole_img, is_mini, is_rabbit)
+        world.moles.append(new_mole)
 
 
 def destroy_moles(world: World):
@@ -154,6 +177,7 @@ def create_lives() -> DesignerObject:
     lives.x = 5  # Some margin so that the text doesn't hug the corner
     lives.y = 5
     return lives
+
 
 def stop_player(world: World):
     """
