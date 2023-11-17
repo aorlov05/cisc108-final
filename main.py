@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from designer import *
 from random import randint
-
+import math
 
 # Constants which represent the ground height and position
 HEIGHT_OF_GROUND = 100
@@ -14,6 +14,8 @@ class Player:
     wheel: DesignerObject
     left: bool
     right: bool
+    rotating_left: bool
+    rotating_right: bool
 
 
 @dataclass
@@ -59,7 +61,7 @@ def create_player() -> Player:
     wheel = image("./wheel.png", anchor="midbottom")
     wheel.y = TOP_OF_GROUND_Y
     cannon.y = wheel.y - cannon.height
-    return Player(cannon, wheel, False, False)
+    return Player(cannon, wheel, False, False, False, False)
 
 
 def move_player(player: Player, pixels: int):
@@ -225,6 +227,48 @@ def make_ammo(world: World):
     if not_too_much_ammo and random_chance:
         world.ammo.append(create_ammo())
 
+
+def on_key_press_rotate_player(world: World, key: str):
+    """
+    Rotate the cannon in the respective direction when pressing the left or right arrow keys
+
+    Args:
+        world (World): The world instance
+        key (str): The key the player pressed
+    """
+    if key == "left":
+        world.player.rotating_left = True
+    elif key == "right":
+        world.player.rotating_right = True
+
+
+def on_key_release_stop_rotate(world: World, key: str):
+    """
+    Stops rotating the cannon when the user lets go of the respective left or right arrow keys
+
+    Args:
+        world (World): The world instance
+        key (str): The key the player pressed
+    """
+    if key == "left":
+        world.player.rotating_left = False
+    elif key == "right":
+        world.player.rotating_right = False
+
+
+def update_player_rotation(world: World):
+    """
+    While the player is holding the left or right arrow keys, rotate the cannon in the respective direction
+
+    Args:
+        world (World): The world instance
+    """
+    if world.player.rotating_left:
+        turn_left(world.player.cannon, 5)
+    elif world.player.rotating_right:
+        turn_right(world.player.cannon, 5)
+
+
 when("updating", make_moles)
 when("updating", make_ammo)
 when("updating", destroy_moles)
@@ -234,4 +278,7 @@ when('done typing', on_key_release_stop_player)
 when('updating', update_player_position)
 when("updating", stop_player)
 when("updating", update_lives)
+when("typing", on_key_press_rotate_player)
+when("done typing", on_key_release_stop_rotate)
+when("updating", update_player_rotation)
 start()
