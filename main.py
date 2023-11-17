@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from designer import *
 from random import randint
-import math
+
 
 # Constants which represent the ground height and position
 HEIGHT_OF_GROUND = 100
@@ -142,6 +142,7 @@ def create_mole(is_mini: bool, is_rabbit: bool) -> DesignerObject:
 def make_moles(world: World):
     """
     This determines when a new mole should appear on screen, so they aren't constantly appearing
+
     Args:
         world (World): The world instance
     """
@@ -164,6 +165,7 @@ def make_moles(world: World):
 def destroy_moles(world: World):
     """
     Gets rid of the moles after an amount of time if they are not shot by the player
+
     Args:
         world (World): The world instance
     """
@@ -172,21 +174,23 @@ def destroy_moles(world: World):
 
 def create_lives() -> DesignerObject:
     """
-        the user starts with 3 lives represented by the three heart emojis
-        Returns:
-            three hearts representing the lives
-        """
+    The user starts with 3 lives represented by the three heart emojis
+
+    Returns:
+        DesignerObject: Text which displays how many lives the user has
+    """
     lives = text("red", "Lives: 3", 40, anchor="topleft")
     lives.x = 5  # Some margin so that the text doesn't hug the corner
     lives.y = 5
     return lives
 
 
-def stop_player(world: World):
+def set_player_screen_bounds(world: World):
     """
     Stops the player from going beyond the bounds of the screen by using the boundaries of the world
+
     Args:
-        world (World): the world instance
+        world (World): The world instance
     """
     if world.player.cannon.x > get_width():
         world.player.right = False
@@ -196,29 +200,33 @@ def stop_player(world: World):
 
 def update_lives(world: World):
     """
-    the user starts with 3 lives represented by the three heart emojis
-    Returns:
-        three hearts representing the lives
+    Constantly sets the lives text equal to the user's number of lives
+
+    Args:
+        world (World): The world instance
     """
     world.lives.text = "Lives: " + str(world.lives_count)
+
 
 def create_ammo() -> DesignerObject:
     """
     Makes the ammo that the player is shooting appear randomly on the ground
 
     Returns:
-        A picture (emoji) of ammo that the  player picks up
+        A picture (emoji) of ammo that the player picks up
     """
-    new_ammo = image("https://www.clker.com//cliparts/K/Z/z/u/k/7/cannon-balls-hi.png", anchor = "midbottom")
+    new_ammo = image("https://www.clker.com//cliparts/K/Z/z/u/k/7/cannon-balls-hi.png", anchor="midbottom")
     new_ammo.scale_x = .1
     new_ammo.scale_y = .1
     new_ammo.x = randint(1, get_width())
     new_ammo.y = TOP_OF_GROUND_Y
     return new_ammo
 
+
 def make_ammo(world: World):
     """
     This determines when more ammo should appear on screen, so they aren't constantly appearing
+
     Args:
         world (World): The world instance
     """
@@ -269,16 +277,21 @@ def update_player_rotation(world: World):
         turn_right(world.player.cannon, 5)
 
 
-when("updating", make_moles)
-when("updating", make_ammo)
-when("updating", destroy_moles)
+# Creates the world
 when('starting', create_world)
+# Handles mole spawning
+when('updating', make_moles)
+when('updating', make_ammo)
+when('updating', destroy_moles)
+# Updates player position on holding A or D
 when('typing', on_key_press_move_player)
 when('done typing', on_key_release_stop_player)
 when('updating', update_player_position)
-when("updating", stop_player)
-when("updating", update_lives)
-when("typing", on_key_press_rotate_player)
-when("done typing", on_key_release_stop_rotate)
-when("updating", update_player_rotation)
+when('updating', set_player_screen_bounds)
+# Updates the number of player lives
+when('updating', update_lives)
+# Allows player to rotate on arrow key hold
+when('typing', on_key_press_rotate_player)
+when('done typing', on_key_release_stop_rotate)
+when('updating', update_player_rotation)
 start()
