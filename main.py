@@ -276,6 +276,11 @@ def update_player_rotation(world: World):
     elif world.player.rotating_right:
         turn_right(world.player.cannon, 5)
 
+def collect_ammo(world: World, player: Player):
+    picked_up_ammo = []
+    for ball in world.ammo:
+        if colliding(ball, player):
+            picked_up_ammo.append(ball)
 
 # Creates the world
 when('starting', create_world)
@@ -294,4 +299,5 @@ when('updating', update_lives)
 when('typing', on_key_press_rotate_player)
 when('done typing', on_key_release_stop_rotate)
 when('updating', update_player_rotation)
+when('updating', collect_ammo)
 start()
