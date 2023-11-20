@@ -50,6 +50,7 @@ class World:
     cannonballs: list[Cannonball]
     cannon_balls: DesignerObject
     level: int
+    levels: DesignerObject
 
 
 def create_world() -> World:
@@ -64,7 +65,8 @@ def create_world() -> World:
     player = create_player()
     lives = create_lives()
     cannon_balls = count_ammo()
-    return World(ground, player, [], 3, lives, [], [], cannon_balls, 1)
+    levels = count_level()
+    return World(ground, player, [], 3, lives, [], [], cannon_balls, 1, levels)
 
 
 def create_player() -> Player:
@@ -466,6 +468,27 @@ def ammo_dissapears(world: World):
         if colliding(ammo, player.cannon):
             delete_ammo(world, ammo)
 
+def count_level() -> DesignerObject:
+    """
+        States which level the user's on  at the top of the screen
+
+        Returns:
+            DesignerObject: Text which displays which level the user's on
+        """
+    levels = text("black", "Level: ", 40, anchor="midtop")
+    levels.x = 400  # Some margin so that the text doesn't hug the corner
+    levels.y = 5
+    return levels
+
+def update_level(world: World):
+    """
+    Constantly sets the level text equal to the user's level
+
+    Args:
+        world (World): The world instance
+    """
+    world.levels.text = "Level: " + str(world.level)
+
 # Creates the world
 when('starting', create_world)
 # Handles mole spawning
@@ -484,11 +507,11 @@ when('typing', on_key_press_rotate_player)
 when('done typing', on_key_release_stop_rotate)
 when('updating', update_player_rotation)
 # Handle ammo and cannonball collisions and shooting
-#when('updating', collect_ammo)
 when('typing', shoot_cannonball)
 when('updating', update_cannonball_position)
 when('updating', destroy_cannonballs_outside_window)
 when('updating', cannonball_collides_with_mole)
 when("updating", update_ammo)
 when("updating", ammo_dissapears)
+when("updating", update_level)
 start()
