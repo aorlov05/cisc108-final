@@ -20,6 +20,7 @@ class Player:
     right: bool
     rotating_left: bool
     rotating_right: bool
+    moles_hit: int
 
 
 @dataclass
@@ -72,7 +73,7 @@ def create_player() -> Player:
     wheel = image("./wheel.png", anchor="midbottom")
     wheel.y = TOP_OF_GROUND_Y
     cannon.y = wheel.y - cannon.height
-    return Player(cannon, wheel, False, False, False, False)
+    return Player(cannon, wheel, False, False, False, False, 0)
 
 
 def move_player(player: Player, pixels: int):
@@ -354,6 +355,60 @@ def shoot_cannonball(world: World, key: str):
         world.cannonballs.append(cannonball)
 
 
+def delete_cannonball(world: World, cannonball: Cannonball):
+    """
+    Removes a cannonball from the world
+
+    Args:
+        world (World): The world instance
+        cannonball (Cannonball): The cannonball to remove
+    """
+    world.cannonballs.remove(cannonball)
+    destroy(cannonball.ball)
+
+
+def delete_mole(world: World, mole: Mole):
+    """
+    Removes a mole from the world
+
+    Args:
+        world (World): The world instance
+        mole (Mole): The mole to remove
+    """
+    world.moles.remove(mole)
+    destroy(mole.mole_img)
+
+
+def destroy_cannonballs_outside_window(world: World):
+    """
+    Removes cannonballs which don't hit anything and go off the screen
+
+    Args:
+        world (World): The world instance to get the cannonballs
+    """
+    for cannonball in world.cannonballs:
+        x = cannonball.ball.x
+        y = cannonball.ball.y
+        if x < 0 or x > get_width() or y < 0 or y > get_height():
+            delete_cannonball(world, cannonball)
+
+
+def cannonball_collides_with_mole(world: World):
+    """
+    Removes both the mole and the cannonball if they collide together.
+    Increases the number of moles hit by one
+
+    Args:
+        world (World): The world instance to get the cannonballs and the moles
+    """
+    for cannonball in world.cannonballs:
+        for mole in world.moles:
+            if colliding(cannonball.ball, mole.mole_img):
+                delete_cannonball(world, cannonball)
+                delete_mole(world, mole)
+                world.player.moles_hit += 1
+
+
 # Creates the world
 when('starting', create_world)
 # Handles mole spawning
@@ -375,4 +430,6 @@ when('updating', update_player_rotation)
 when('updating', collect_ammo)
 when('typing', shoot_cannonball)
 when('updating', update_cannonball_position)
+when('updating', destroy_cannonballs_outside_window)
+when('updating', cannonball_collides_with_mole)
 start()
