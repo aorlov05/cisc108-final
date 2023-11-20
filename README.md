@@ -23,15 +23,16 @@ Video Showcase: https://youtu.be/aO3bL7Ei3qo
 - [x] The player cannot move off the screen
 
 #### Phase 2
-- [ ] The player can pick up the ammo by running into it
-- [ ] The user clicks on the screen to shoot a bullet in the direction of the cursor
-- [ ] Every 10 moles that the player shoots, the level increases
-- [ ] Every level increase, the moles spawn and disappear faster
-- [ ] The player has a maximum amount of ammo that they can collect
-- [ ] The player has to reload when they run out of ammo in a magazine
-- [ ] The bad moles attempt to shoot the player
+Video Showcase: https://youtu.be/ID4qFghJmFg
+- [x] The player can pick up the ammo by running into it
+- [x] The user uses arrow keys to turn the cannon
+- [x] The user can fire a cannonball
+- [x] Every time the player hits all the moles in a level, the level increases
+- [x] Every level increase, more moles spawn in
+- [x] The player has a maximum amount of ammo that they can collect
 
 #### Phase 3
+- [ ] The bad moles attempt to shoot the player
 - [ ] The user gets 1 point for shooting the bad moles.
 - [ ] The user gets 3 points for shooting the mini bad moles.
 - [ ] The user loses 3 points for shooting the good rabbits.
