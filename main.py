@@ -10,6 +10,7 @@ TOP_OF_GROUND_Y = get_height() - HEIGHT_OF_GROUND
 # Represents the highest number of degrees the cannon can rotate before stopping
 MAX_CANNON_ANGLE = 85
 CANNONBALL_SPEED = 5
+MAX_AMMO = 10
 
 
 @dataclass
@@ -322,7 +323,10 @@ def update_ammo(world: World):
     player = world.player
     for ball in world.ammo:
         if colliding(ball, player.cannon):
+            if player.ammo_count < MAX_AMMO:
                 player.ammo_count += 1
+            else:
+                player.ammo_count += 0
     world.cannon_balls.text = "Ammo: " + str(player.ammo_count)
 
 def update_cannonball_position(world: World):
