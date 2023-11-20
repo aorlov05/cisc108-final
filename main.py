@@ -21,6 +21,7 @@ class Player:
     rotating_left: bool
     rotating_right: bool
     moles_hit: int
+    moles_hit_in_current_level: int
     ammo_count: int
 
 
@@ -47,6 +48,7 @@ class World:
     ammo: list[DesignerObject]
     cannonballs: list[Cannonball]
     cannon_balls: DesignerObject
+    level: int
 
 
 def create_world() -> World:
@@ -61,7 +63,7 @@ def create_world() -> World:
     player = create_player()
     lives = create_lives()
     cannon_balls = count_ammo()
-    return World(ground, player, [], 3, lives, [], [], cannon_balls)
+    return World(ground, player, [], 3, lives, [], [], cannon_balls, 1)
 
 
 def create_player() -> Player:
@@ -76,7 +78,7 @@ def create_player() -> Player:
     wheel = image("./wheel.png", anchor="midbottom")
     wheel.y = TOP_OF_GROUND_Y
     cannon.y = wheel.y - cannon.height
-    return Player(cannon, wheel, False, False, False, False, 0, 0)
+    return Player(cannon, wheel, False, False, False, False, 0, 0, 0)
 
 
 def move_player(player: Player, pixels: int):
@@ -161,7 +163,7 @@ def make_moles(world: World):
     Args:
         world (World): The world instance
     """
-    not_too_many_moles = len(world.moles) < 2
+    not_too_many_moles = len(world.moles) <= world.level
     random_spawn_chance = randint(1, 100) == 2
     if not_too_many_moles and random_spawn_chance:
         # Adds a 10% chance for the mole to be small, or 10% for it to be a rabbit
@@ -245,7 +247,7 @@ def make_ammo(world: World):
     Args:
         world (World): The world instance
     """
-    not_too_much_ammo = len(world.ammo) < 2
+    not_too_much_ammo = len(world.ammo) <= world.level
     random_chance = randint(1, 100) == 2
     if not_too_much_ammo and random_chance:
         world.ammo.append(create_ammo())
@@ -408,6 +410,18 @@ def destroy_cannonballs_outside_window(world: World):
             delete_cannonball(world, cannonball)
 
 
+def check_if_level_passed(world: World):
+    """
+    Checks if the player hit enough moles to move to the next level
+
+    Args:
+         world (World): The world instance
+    """
+    if world.player.moles_hit_in_current_level >= world.level:
+        world.player.moles_hit_in_current_level = 0
+        world.level += 1
+
+
 def cannonball_collides_with_mole(world: World):
     """
     Removes both the mole and the cannonball if they collide together.
@@ -422,6 +436,8 @@ def cannonball_collides_with_mole(world: World):
                 delete_cannonball(world, cannonball)
                 delete_mole(world, mole)
                 world.player.moles_hit += 1
+                world.player.moles_hit_in_current_level += 1
+                check_if_level_passed(world)
 
 def delete_ammo(world: World, ammo: DesignerObject):
     """
