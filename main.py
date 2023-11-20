@@ -21,6 +21,7 @@ class Player:
     rotating_left: bool
     rotating_right: bool
     moles_hit: int
+    ammo_count: int
 
 
 @dataclass
@@ -75,7 +76,7 @@ def create_player() -> Player:
     wheel = image("./wheel.png", anchor="midbottom")
     wheel.y = TOP_OF_GROUND_Y
     cannon.y = wheel.y - cannon.height
-    return Player(cannon, wheel, False, False, False, False, 0)
+    return Player(cannon, wheel, False, False, False, False, 0, 0)
 
 
 def move_player(player: Player, pixels: int):
@@ -298,21 +299,21 @@ def update_player_rotation(world: World):
         turn_right(cannon, 5)
 
 
-def collect_ammo(world: World, player: Player):
-    """
+"""def collect_ammo(world: World, player: Player):
+    
     Adds ammo to a list when the player runs into it
 
     Args:
         world (World): The world instance
         player (Player): The player who runs into a cannonball
-    """
+    
     picked_up_ammo = []
     for ball in world.ammo:
         if colliding(ball, player):
-            picked_up_ammo.append(ball)
+            picked_up_ammo.append(ball)"""
 
 def count_ammo() -> DesignerObject:
-    cannon_balls = text("black", "Ammo: 0", 40, anchor="topright")
+    cannon_balls = text("black", "Ammo: ", 40, anchor="topright")
     cannon_balls.x = 750  # Some margin so that the text doesn't hug the corner
     cannon_balls.y = 5
     return cannon_balls
@@ -324,7 +325,11 @@ def update_ammo(world: World):
     Args:
         world (World): The world instance
     """
-    world.cannon_balls.text = "Ammo: " + str(world.ammo_count)
+    player = world.player
+    for ball in world.ammo:
+        if colliding(ball, player.cannon):
+                player.ammo_count += 1
+    world.cannon_balls.text = "Ammo: " + str(player.ammo_count)
 
 def update_cannonball_position(world: World):
     """
@@ -443,9 +448,10 @@ when('typing', on_key_press_rotate_player)
 when('done typing', on_key_release_stop_rotate)
 when('updating', update_player_rotation)
 # Handle ammo and cannonball collisions and shooting
-when('updating', collect_ammo)
+#when('updating', collect_ammo)
 when('typing', shoot_cannonball)
 when('updating', update_cannonball_position)
 when('updating', destroy_cannonballs_outside_window)
 when('updating', cannonball_collides_with_mole)
+when("updating", update_ammo)
 start()
