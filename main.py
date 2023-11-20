@@ -215,7 +215,7 @@ def create_ammo() -> DesignerObject:
     Returns:
         A picture (emoji) of ammo that the player picks up
     """
-    new_ammo = image("https://www.clker.com//cliparts/K/Z/z/u/k/7/cannon-balls-hi.png", anchor="midbottom")
+    new_ammo = image("./img.png", anchor="midbottom")
     new_ammo.scale_x = .1
     new_ammo.scale_y = .1
     new_ammo.x = randint(1, get_width())
