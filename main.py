@@ -45,6 +45,7 @@ class World:
     lives: DesignerObject
     ammo: list[DesignerObject]
     cannonballs: list[Cannonball]
+    cannon_balls: DesignerObject
 
 
 def create_world() -> World:
@@ -58,7 +59,8 @@ def create_world() -> World:
                        TOP_OF_GROUND_Y, anchor='topleft')
     player = create_player()
     lives = create_lives()
-    return World(ground, player, [], 3, lives, [], [])
+    cannon_balls = count_ammo()
+    return World(ground, player, [], 3, lives, [], [], cannon_balls)
 
 
 def create_player() -> Player:
@@ -309,6 +311,20 @@ def collect_ammo(world: World, player: Player):
         if colliding(ball, player):
             picked_up_ammo.append(ball)
 
+def count_ammo() -> DesignerObject:
+    cannon_balls = text("black", "Ammo: 0", 40, anchor="topright")
+    cannon_balls.x = 750  # Some margin so that the text doesn't hug the corner
+    cannon_balls.y = 5
+    return cannon_balls
+
+def update_ammo(world: World):
+    """
+    Constantly sets the ammo text equal to the user's amount of ammo
+
+    Args:
+        world (World): The world instance
+    """
+    world.cannon_balls.text = "Ammo: " + str(world.ammo_count)
 
 def update_cannonball_position(world: World):
     """
