@@ -226,7 +226,7 @@ def create_ammo() -> DesignerObject:
     Returns:
         A picture (emoji) of ammo that the player picks up
     """
-    new_ammo = image("./img.png", anchor="midbottom")
+    new_ammo = image("ammo.png", anchor="midbottom")
     new_ammo.scale_x = .1
     new_ammo.scale_y = .1
     new_ammo.x = randint(1, get_width())
@@ -296,6 +296,13 @@ def update_player_rotation(world: World):
 
 
 def collect_ammo(world: World, player: Player):
+    """
+    Adds ammo to a list when the player runs into it
+
+    Args:
+        world (World): The world instance
+        player (Player): The player who runs into a cannonball
+    """
     picked_up_ammo = []
     for ball in world.ammo:
         if colliding(ball, player):
@@ -335,6 +342,13 @@ def create_cannonball(player: Player) -> Cannonball:
 
 
 def shoot_cannonball(world: World, key: str):
+    """
+    Spawn a cannonball when the player presses space
+
+    Args:
+        world (World): The world instance to get the player
+        key (str): The key pressed by the user
+    """
     if key == "space":
         cannonball = create_cannonball(world.player)
         world.cannonballs.append(cannonball)
