@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 from designer import *
 from random import randint
@@ -7,7 +8,8 @@ from random import randint
 HEIGHT_OF_GROUND = 100
 TOP_OF_GROUND_Y = get_height() - HEIGHT_OF_GROUND
 # Represents the highest number of degrees the cannon can rotate before stopping
-MAX_CANNON_ANGLE = 100
+MAX_CANNON_ANGLE = 85
+CANNONBALL_SPEED = 5
 
 
 @dataclass
@@ -28,6 +30,12 @@ class Mole:
 
 
 @dataclass
+class Cannonball:
+    ball: DesignerObject
+    angle: int
+
+
+@dataclass
 class World:
     ground: DesignerObject
     player: Player
@@ -35,6 +43,7 @@ class World:
     lives_count: int
     lives: DesignerObject
     ammo: list[DesignerObject]
+    cannonballs: list[Cannonball]
 
 
 def create_world() -> World:
@@ -48,7 +57,7 @@ def create_world() -> World:
                        TOP_OF_GROUND_Y, anchor='topleft')
     player = create_player()
     lives = create_lives()
-    return World(ground, player, [], 3, lives, [])
+    return World(ground, player, [], 3, lives, [], [])
 
 
 def create_player() -> Player:
@@ -293,6 +302,44 @@ def collect_ammo(world: World, player: Player):
             picked_up_ammo.append(ball)
 
 
+def update_cannonball_position(world: World):
+    """
+    Constantly updates the cannonball position to move in the direction
+    that the player cannon initially shot in
+    https://stackoverflow.com/a/46697552
+
+    Args:
+        world (World): The world instance to get the cannonballs from
+    """
+    for cannonball in world.cannonballs:
+        corrected_angle = -cannonball.angle - 90
+        new_x = cannonball.ball.x + (CANNONBALL_SPEED * math.cos(math.radians(corrected_angle)))
+        new_y = cannonball.ball.y + (CANNONBALL_SPEED * math.sin(math.radians(corrected_angle)))
+        cannonball.ball.x = new_x
+        cannonball.ball.y = new_y
+
+
+def create_cannonball(player: Player) -> Cannonball:
+    """
+    Spawns a cannonball at the player cannon's location
+
+    Args:
+        player (Player): The player in the world
+    """
+    cannon = player.cannon
+    # Spawns the cannonball in the center of the cannon
+    ball = circle("black", 10, cannon.x, cannon.y + (cannon.height // 2))
+    angle = cannon.angle
+    new_cannonball = Cannonball(ball, angle)
+    return new_cannonball
+
+
+def shoot_cannonball(world: World, key: str):
+    if key == "space":
+        cannonball = create_cannonball(world.player)
+        world.cannonballs.append(cannonball)
+
+
 # Creates the world
 when('starting', create_world)
 # Handles mole spawning
@@ -310,5 +357,8 @@ when('updating', update_lives)
 when('typing', on_key_press_rotate_player)
 when('done typing', on_key_release_stop_rotate)
 when('updating', update_player_rotation)
+# Handle ammo and cannonball collisions and shooting
 when('updating', collect_ammo)
+when('typing', shoot_cannonball)
+when('updating', update_cannonball_position)
 start()
