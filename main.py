@@ -6,6 +6,8 @@ from random import randint
 # Constants which represent the ground height and position
 HEIGHT_OF_GROUND = 100
 TOP_OF_GROUND_Y = get_height() - HEIGHT_OF_GROUND
+# Represents the highest number of degrees the cannon can rotate before stopping
+MAX_CANNON_ANGLE = 100
 
 
 @dataclass
@@ -267,20 +269,29 @@ def on_key_release_stop_rotate(world: World, key: str):
 def update_player_rotation(world: World):
     """
     While the player is holding the left or right arrow keys, rotate the cannon in the respective direction
+    If the cannon is rotated too far right or left, stop it so that it doesn't face the ground
 
     Args:
         world (World): The world instance
     """
-    if world.player.rotating_left:
-        turn_left(world.player.cannon, 5)
-    elif world.player.rotating_right:
-        turn_right(world.player.cannon, 5)
+    player = world.player
+    cannon = player.cannon
+    if player.rotating_left:
+        if cannon.angle >= MAX_CANNON_ANGLE:  # Stop cannon from turning towards the ground
+            player.rotating_left = False
+        turn_left(cannon, 5)
+    elif player.rotating_right:
+        if cannon.angle <= -MAX_CANNON_ANGLE:
+            player.rotating_right = False
+        turn_right(cannon, 5)
+
 
 def collect_ammo(world: World, player: Player):
     picked_up_ammo = []
     for ball in world.ammo:
         if colliding(ball, player):
             picked_up_ammo.append(ball)
+
 
 # Creates the world
 when('starting', create_world)
