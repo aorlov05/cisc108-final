@@ -298,20 +298,6 @@ def update_player_rotation(world: World):
             player.rotating_right = False
         turn_right(cannon, 5)
 
-
-"""def collect_ammo(world: World, player: Player):
-    
-    Adds ammo to a list when the player runs into it
-
-    Args:
-        world (World): The world instance
-        player (Player): The player who runs into a cannonball
-    
-    picked_up_ammo = []
-    for ball in world.ammo:
-        if colliding(ball, player):
-            picked_up_ammo.append(ball)"""
-
 def count_ammo() -> DesignerObject:
     cannon_balls = text("black", "Ammo: ", 40, anchor="topright")
     cannon_balls.x = 750  # Some margin so that the text doesn't hug the corner
@@ -429,6 +415,21 @@ def cannonball_collides_with_mole(world: World):
                 delete_mole(world, mole)
                 world.player.moles_hit += 1
 
+def delete_ammo(world: World, ammo: DesignerObject):
+    """
+    Removes ammo from the world
+
+    Args:
+        world (World): The world instance
+    """
+    world.ammo.remove(ammo)
+    destroy(ammo)
+
+def ammo_dissapears(world: World):
+    player = world.player
+    for ammo in world.ammo:
+        if colliding(ammo, player.cannon):
+            delete_ammo(world, ammo)
 
 # Creates the world
 when('starting', create_world)
@@ -454,4 +455,5 @@ when('updating', update_cannonball_position)
 when('updating', destroy_cannonballs_outside_window)
 when('updating', cannonball_collides_with_mole)
 when("updating", update_ammo)
+when("updating", ammo_dissapears)
 start()
