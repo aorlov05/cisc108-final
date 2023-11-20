@@ -351,15 +351,17 @@ def create_cannonball(player: Player) -> Cannonball:
 
 def shoot_cannonball(world: World, key: str):
     """
-    Spawn a cannonball when the player presses space
+    Spawns a cannonball when the player presses space
+    Checks if they have ammo to shoot, and removes one ammo if they do
 
     Args:
         world (World): The world instance to get the player
         key (str): The key pressed by the user
     """
-    if key == "space":
+    if key == "space" and world.player.ammo_count >= 1:
         cannonball = create_cannonball(world.player)
         world.cannonballs.append(cannonball)
+        world.player.ammo_count -= 1
 
 
 def delete_cannonball(world: World, cannonball: Cannonball):
