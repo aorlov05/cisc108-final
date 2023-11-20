@@ -299,6 +299,12 @@ def update_player_rotation(world: World):
         turn_right(cannon, 5)
 
 def count_ammo() -> DesignerObject:
+    """
+        The user starts with no ammo represented by the number at the top of the screen
+
+        Returns:
+            DesignerObject: Text which displays how much ammo the user has
+        """
     cannon_balls = text("black", "Ammo: ", 40, anchor="topright")
     cannon_balls.x = 750  # Some margin so that the text doesn't hug the corner
     cannon_balls.y = 5
@@ -423,11 +429,18 @@ def delete_ammo(world: World, ammo: DesignerObject):
 
     Args:
         world (World): The world instance
+        ammo (DesignerObject): the ammo being picked up and removed
     """
     world.ammo.remove(ammo)
     destroy(ammo)
 
 def ammo_dissapears(world: World):
+    """
+        Removes the ammo if it collides with the player.
+
+        Args:
+            world (World): The world instance to get the cannonballs and the moles
+        """
     player = world.player
     for ammo in world.ammo:
         if colliding(ammo, player.cannon):
