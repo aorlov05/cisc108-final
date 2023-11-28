@@ -84,6 +84,16 @@ def create_player() -> Player:
     return Player(cannon, wheel, False, False, False, False, 0, 0, 0)
 
 
+def get_half_cannon_width(world: World):
+    """
+    Returns half the width of the cannon to set its bounds
+
+    Args:
+        world (World): The world instance
+    """
+    return world.player.cannon.width // 2
+
+
 def move_player(player: Player, pixels: int):
     """
     Moves the player the specified number of pixels
@@ -120,9 +130,9 @@ def on_key_press_move_player(world: World, key: str):
         world (World): The world instance
         key (str): The key the user presses
     """
-    if key == "a":
+    if key == "a" and world.player.cannon.x > get_half_cannon_width(world):
         world.player.left = True
-    elif key == "d":
+    elif key == "d" and world.player.cannon.x < get_width() - get_half_cannon_width(world):
         world.player.right = True
 
 
@@ -212,9 +222,9 @@ def set_player_screen_bounds(world: World):
     Args:
         world (World): The world instance
     """
-    if world.player.cannon.x > get_width():
+    if world.player.cannon.x > get_width() - get_half_cannon_width(world):
         world.player.right = False
-    elif world.player.cannon.x < 0:
+    elif world.player.cannon.x < get_half_cannon_width(world):
         world.player.left = False
 
 
