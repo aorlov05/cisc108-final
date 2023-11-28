@@ -150,7 +150,7 @@ def on_key_release_stop_player(world: World, key: str):
         world.player.right = False
 
 
-def create_mole(is_mini: bool, is_rabbit: bool) -> DesignerObject:
+def create_mole(world: World, is_mini: bool, is_rabbit: bool) -> DesignerObject:
     """
     Makes the moles that the player is trying to shoot appear randomly
 
@@ -162,7 +162,7 @@ def create_mole(is_mini: bool, is_rabbit: bool) -> DesignerObject:
     else:
         new_mole = emoji("🐀")
     new_mole.x = randint(1, get_width())
-    new_mole.y = randint(1, TOP_OF_GROUND_Y)
+    new_mole.y = randint(1, TOP_OF_GROUND_Y - world.player.cannon.height)
     if is_mini:
         new_mole.scale_x = 0.5
         new_mole.scale_y = 0.5
@@ -187,7 +187,7 @@ def make_moles(world: World):
             is_mini = True
         elif random_type_chance == 2:
             is_rabbit = True
-        mole_img = create_mole(is_mini, is_rabbit)
+        mole_img = create_mole(world, is_mini, is_rabbit)
         new_mole = Mole(mole_img, is_mini, is_rabbit)
         world.moles.append(new_mole)
 
@@ -274,10 +274,11 @@ def on_key_press_rotate_player(world: World, key: str):
         world (World): The world instance
         key (str): The key the player pressed
     """
-    if key == "left":
-        world.player.rotating_left = True
-    elif key == "right":
-        world.player.rotating_right = True
+    player = world.player
+    if key == "left" and player.cannon.angle < MAX_CANNON_ANGLE:
+        player.rotating_left = True
+    elif key == "right" and player.cannon.angle > -MAX_CANNON_ANGLE:
+        player.rotating_right = True
 
 
 def on_key_release_stop_rotate(world: World, key: str):
