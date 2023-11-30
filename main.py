@@ -159,9 +159,9 @@ def create_mole(world: World, is_mini: bool, is_rabbit: bool) -> DesignerObject:
         A picture (emoji) of a mole that is the players target
     """
     if is_rabbit:
-        new_mole = emoji("🐇")
+        new_mole = image("./rabbit.png")
     else:
-        new_mole = emoji("🐀")
+        new_mole = image("./mouse.png")
     new_mole.x = randint(1, get_width())
     new_mole.y = randint(1, TOP_OF_GROUND_Y - world.player.cannon.height)
     if is_mini:
@@ -467,7 +467,11 @@ def cannonball_collides_with_mole(world: World):
 
 def mole_faces_player(world: World):
     for mole in world.moles:
-        point_towards(mole.mole_img, world.player.cannon)
+        mole_img = mole.mole_img
+        cannon = world.player.cannon
+        rise = cannon.y - mole_img.y
+        run = cannon.x - mole_img.x
+        point_in_direction(mole_img, math.degrees(math.atan2(-rise, run)) % 360)
 
 
 def mole_shoots_player(world: World):
@@ -475,7 +479,7 @@ def mole_shoots_player(world: World):
         random_fire_chance = randint(1, 100) <= world.level
         if random_fire_chance:
             mole_img = mole.mole_img
-            cannonball = create_cannonball(mole_img.x, mole_img.y, False, mole_img.angle)
+            cannonball = create_cannonball(mole_img.x, mole_img.y, False, mole_img.angle - 90)
             world.cannonballs.append(cannonball)
 
 
