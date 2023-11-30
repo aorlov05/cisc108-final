@@ -37,6 +37,7 @@ class Mole:
 class Cannonball:
     ball: DesignerObject
     angle: int
+    is_from_player: bool
 
 
 @dataclass
@@ -359,18 +360,22 @@ def update_cannonball_position(world: World):
         cannonball.ball.y = new_y
 
 
-def create_cannonball(player: Player) -> Cannonball:
+def create_cannonball(x: int, y: int, is_from_player: bool, angle: int) -> Cannonball:
     """
     Spawns a cannonball at the player cannon's location
 
     Args:
-        player (Player): The player in the world
+        x (int): The x initial position of the cannonball
+        y (int): The y initial position of the cannonball
+        is_from_player (bool): If the player shot the cannonball
+        angle (int): The angle to move the cannonball
     """
-    cannon = player.cannon
-    # Spawns the cannonball in the center of the cannon
-    ball = circle("black", 10, cannon.x, cannon.y + (cannon.height // 2))
-    angle = cannon.angle
-    new_cannonball = Cannonball(ball, angle)
+    if is_from_player:
+        color = "black"
+    else:
+        color = "red"
+    ball = circle(color, 10, x, y)
+    new_cannonball = Cannonball(ball, angle, is_from_player)
     return new_cannonball
 
 
@@ -383,8 +388,11 @@ def shoot_cannonball(world: World, key: str):
         world (World): The world instance to get the player
         key (str): The key pressed by the user
     """
-    if key == "space" and world.player.ammo_count >= 1:
-        cannonball = create_cannonball(world.player)
+    player = world.player
+    if key == "space" and player.ammo_count >= 1:
+        cannon = player.cannon
+        # Spawns the cannonball in the center of the cannon
+        cannonball = create_cannonball(cannon.x, cannon.y + (cannon.height // 2), True, cannon.angle)
         world.cannonballs.append(cannonball)
         world.player.ammo_count -= 1
 
@@ -449,12 +457,27 @@ def cannonball_collides_with_mole(world: World):
     """
     for cannonball in world.cannonballs:
         for mole in world.moles:
-            if colliding(cannonball.ball, mole.mole_img):
+            if colliding(cannonball.ball, mole.mole_img) and cannonball.is_from_player:
                 delete_cannonball(world, cannonball)
                 delete_mole(world, mole)
                 world.player.moles_hit += 1
                 world.player.moles_hit_in_current_level += 1
                 check_if_level_passed(world)
+
+
+def mole_faces_player(world: World):
+    for mole in world.moles:
+        point_towards(mole.mole_img, world.player.cannon)
+
+
+def mole_shoots_player(world: World):
+    for mole in world.moles:
+        random_fire_chance = randint(1, 100) <= world.level
+        if random_fire_chance:
+            mole_img = mole.mole_img
+            cannonball = create_cannonball(mole_img.x, mole_img.y, False, mole_img.angle)
+            world.cannonballs.append(cannonball)
+
 
 def delete_ammo(world: World, ammo: DesignerObject):
     """
@@ -525,4 +548,6 @@ when('updating', cannonball_collides_with_mole)
 when("updating", update_ammo)
 when("updating", ammo_dissapears)
 when("updating", update_level)
+when("updating", mole_faces_player)
+when("updating", mole_shoots_player)
 start()
