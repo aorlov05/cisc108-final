@@ -536,6 +536,7 @@ def game_over(world: World):
     """
     if world.lives_count == 0:
         pause()
+
 def loose_lives(world: World):
     """
     This function decreases the number of lives that the player
@@ -543,12 +544,12 @@ def loose_lives(world: World):
     Args:
         world(World): the world instance
     """
-   for cannonball in world.cannonballs:
-       if not cannonball.is_from_player:
-           if colliding(cannonball.ball, world.player.cannon):
-               world.lives_count -= 1
-               delete_cannonball(world,cannonball)
-               game_over(world)
+    for cannonball in world.cannonballs:
+        if not cannonball.is_from_player:
+            if colliding(cannonball.ball, world.player.cannon):
+                world.lives_count -= 1
+                delete_cannonball(world,cannonball)
+                game_over(world)
 
 
 # Creates the world
