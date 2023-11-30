@@ -523,6 +523,30 @@ def update_level(world: World):
     """
     world.levels.text = "Level: " + str(world.level)
 
+def game_over(world: World):
+    """
+    When the player runs out of lives, the game ends
+
+    Args:
+        world(World): The world instance
+    """
+    if world.lives_count == 0:
+        pause()
+def loose_lives(world: World):
+    """
+    This function decreases the number of lives that the player
+    has when they are hit by a cannonball from the moles
+    Args:
+        world(World): the world instance
+    """
+   for cannonball in world.cannonballs:
+       if not cannonball.is_from_player:
+           if colliding(cannonball.ball, world.player.cannon):
+               world.lives_count -= 1
+               delete_cannonball(world,cannonball)
+               game_over(world)
+
+
 # Creates the world
 when('starting', create_world)
 # Handles mole spawning
@@ -550,4 +574,5 @@ when("updating", ammo_dissapears)
 when("updating", update_level)
 when("updating", mole_faces_player)
 when("updating", mole_shoots_player)
+when("updating", loose_lives)
 start()
