@@ -89,12 +89,15 @@ def create_player() -> Player:
     return Player(cannon, wheel, False, False, False, False, 0, 0, 0)
 
 
-def get_half_cannon_width(world: World):
+def get_half_cannon_width(world: World) -> int:
     """
     Returns half the width of the cannon to set its screen bounds
 
     Args:
         world (World): The world instance
+
+    Returns:
+        int: Half the width of the cannon for boundary purposes
     """
     return world.player.cannon.width // 2
 
@@ -145,7 +148,7 @@ def on_key_press_move_player(world: World, key: str):
 
 def on_key_release_stop_player(world: World, key: str):
     """
-    Stops moving the player left when letting go of a, 
+    Stops moving the player left when letting go of a,
     and the same when letting go of d
 
     Args:
@@ -162,6 +165,11 @@ def create_mole(world: World, is_mini: bool, is_rabbit: bool) -> DesignerObject:
     """
     Makes the moles that the player is trying to shoot appear randomly
     Changes the size or image if the mole is a rabbit or mini
+
+    Args:
+        world (World): The world instance
+        is_mini (bool): Whether the mole is mini or not
+        is_rabbit (bool): Whether the mole is a good rabbit or not
 
     Returns:
         DesignerObject: A picture (emoji) of a mole that is the players target
@@ -332,7 +340,7 @@ def update_player_rotation(world: World):
 def count_ammo() -> DesignerObject:
     """
     Creates the ammo count text at the top of the screen with an initial state of 0 ammo
-    
+
     Returns:
         DesignerObject: Text which displays how much ammo the user has
     """
@@ -488,6 +496,13 @@ def cannonball_collides_with_mole(world: World):
 
 
 def mole_faces_player(world: World):
+    """
+    This function points the moles in the direction of the player
+    so it can shoot them with its own cannonballs
+
+    Args:
+        world (World): The world instance
+    """
     for mole in world.moles:
         mole_img = mole.mole_img
         cannon = world.player.cannon
@@ -497,6 +512,12 @@ def mole_faces_player(world: World):
 
 
 def mole_shoots_player(world: World):
+    """
+    This function shoot has the mole shoot a cannonball that does damage to the player
+
+    Args:
+        world (World): The world instance
+    """
     for mole in world.moles:
         if not mole.is_rabbit:
             random_fire_chance = randint(1, 500) <= world.level
@@ -559,7 +580,10 @@ def game_over(world: World) -> bool:
     Returns if the game is over if the player has no lives left
 
     Args:
-        world(World): The world instance
+        world (World): The world instance
+
+    Returns:
+        bool: Whether the player has lives left
     """
     return world.lives_count == 0
 
