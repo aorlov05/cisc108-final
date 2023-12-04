@@ -71,6 +71,7 @@ def create_world() -> World:
     scores = create_score()
     return World(ground, player, [], 3, lives, [], [], cannon_balls, 1, levels, scores )
 
+
 def create_player() -> Player:
     """
     Creates a new player object which consists of a cannon and a wheel
@@ -92,6 +93,9 @@ def get_half_cannon_width(world: World):
 
     Args:
         world (World): The world instance
+
+    Returns:
+        Half the width of the cannon for boundary purposes
     """
     return world.player.cannon.width // 2
 
@@ -156,8 +160,13 @@ def create_mole(world: World, is_mini: bool, is_rabbit: bool) -> DesignerObject:
     """
     Makes the moles that the player is trying to shoot appear randomly
 
+    Args:
+        world(World): The World instance
+        is_mini(bool): Whether the mole is mini or not
+        is_rabbit(bool): Whether the mole is a good rabbit or not
+
     Returns:
-        A picture (emoji) of a mole that is the players target
+        DesignerObject: A picture (emoji) of a mole that is the players target
     """
     if is_rabbit:
         new_mole = image("./rabbit.png")
@@ -318,6 +327,7 @@ def update_player_rotation(world: World):
             player.rotating_right = False
         turn_right(cannon, 5)
 
+
 def count_ammo() -> DesignerObject:
     """
         The user starts with no ammo represented by the number at the top of the screen
@@ -329,6 +339,7 @@ def count_ammo() -> DesignerObject:
     cannon_balls.x = 750  # Some margin so that the text doesn't hug the corner
     cannon_balls.y = 5
     return cannon_balls
+
 
 def update_ammo(world: World):
     """
@@ -345,6 +356,7 @@ def update_ammo(world: World):
             else:
                 player.ammo_count += 0
     world.cannon_balls.text = "Ammo: " + str(player.ammo_count)
+
 
 def update_cannonball_position(world: World):
     """
@@ -476,13 +488,13 @@ def cannonball_collides_with_mole(world: World):
 
 
 def mole_faces_player(world: World):
-    '''
+    """
     This function points the moles in the direction of the player
     so it can shoot them with its own cannonballs
 
     Args:
         world(World): the world instance
-    '''
+    """
     for mole in world.moles:
         mole_img = mole.mole_img
         cannon = world.player.cannon
@@ -518,6 +530,7 @@ def delete_ammo(world: World, ammo: DesignerObject):
     world.ammo.remove(ammo)
     destroy(ammo)
 
+
 def ammo_dissapears(world: World):
     """
         Removes the ammo if it collides with the player.
@@ -530,17 +543,19 @@ def ammo_dissapears(world: World):
         if colliding(ammo, player.cannon):
             delete_ammo(world, ammo)
 
+
 def count_level() -> DesignerObject:
     """
-        States which level the user's on  at the top of the screen
+    States which level the user's on  at the top of the screen
 
-        Returns:
-            DesignerObject: Text which displays which level the user's on
-        """
+    Returns:
+        DesignerObject: Text which displays which level the user's on
+    """
     levels = text("black", "Level: ", 30, anchor="midtop")
     levels.x = 300  # Some margin so that the text doesn't hug the corner
     levels.y = 5
     return levels
+
 
 def update_level(world: World):
     """
@@ -551,14 +566,19 @@ def update_level(world: World):
     """
     world.levels.text = "Level: " + str(world.level)
 
+
 def game_over(world: World) -> bool:
     """
     Returns if the game is over if the player has no lives left
 
     Args:
         world(World): The world instance
+
+    Returns:
+        bool: whether or not the player has lives left
     """
     return world.lives_count == 0
+
 
 def loose_lives(world: World):
     """
@@ -583,13 +603,14 @@ def show_game_over_screen(world: World):
     """
     text("red", "Game over! You got to level " + str(world.level) + ".", 40)
 
+
 def create_score() -> DesignerObject:
     """
-        States what the user's score is at the top of the screen
+    States what the user's score is at the top of the screen
 
-        Returns:
-            DesignerObject: Text which displays the users score
-        """
+    Returns:
+        DesignerObject: Text which displays the users score
+    """
     scores = text("black", "Score: ", 30, anchor="midtop")
     scores.x = 500  # Some margin so that the text doesn't hug the corner
     scores.y = 5
@@ -598,12 +619,13 @@ def create_score() -> DesignerObject:
 
 def update_score(world: World):
     """
-       Constantly sets the score text equal to the user's score
+    Constantly sets the score text equal to the user's score
 
-       Args:
-           world (World): The world instance
-       """
+    Args:
+        world (World): The world instance
+    """
     world.scores.text = "Score: " + str(world.player.moles_hit)
+
 
 # Creates the world
 when('starting', create_world)
