@@ -476,6 +476,13 @@ def cannonball_collides_with_mole(world: World):
 
 
 def mole_faces_player(world: World):
+    '''
+    This function points the moles in the direction of the player
+    so it can shoot them with its own cannonballs
+
+    Args:
+        world(World): the world instance
+    '''
     for mole in world.moles:
         mole_img = mole.mole_img
         cannon = world.player.cannon
@@ -485,6 +492,12 @@ def mole_faces_player(world: World):
 
 
 def mole_shoots_player(world: World):
+    """
+    This function shoot has the mole shoot a cannonball that does damage to the player
+
+    Args:
+        world(World): The world instance
+    """
     for mole in world.moles:
         if not mole.is_rabbit:
             random_fire_chance = randint(1, 500) <= world.level
