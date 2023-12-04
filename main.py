@@ -532,15 +532,14 @@ def update_level(world: World):
     """
     world.levels.text = "Level: " + str(world.level)
 
-def game_over(world: World):
+def game_over(world: World) -> bool:
     """
-    When the player runs out of lives, the game ends
+    Returns if the game is over if the player has no lives left
 
     Args:
         world(World): The world instance
     """
-    if world.lives_count == 0:
-        pause()
+    return world.lives_count == 0
 
 def loose_lives(world: World):
     """
@@ -554,7 +553,16 @@ def loose_lives(world: World):
             if colliding(cannonball.ball, world.player.cannon):
                 world.lives_count -= 1
                 delete_cannonball(world,cannonball)
-                game_over(world)
+
+
+def show_game_over_screen(world: World):
+    """
+    Displays the game over screen with the current level count if they lose all of their lives
+
+    Args:
+        world (World): The world instance
+    """
+    text("red", "Game over! You got to level " + str(world.level) + ".", 40)
 
 
 # Creates the world
@@ -584,4 +592,5 @@ when("updating", update_level)
 when("updating", mole_faces_player)
 when("updating", mole_shoots_player)
 when("updating", loose_lives)
+when(game_over, show_game_over_screen, pause)
 start()
