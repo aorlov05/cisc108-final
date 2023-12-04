@@ -193,14 +193,16 @@ def make_moles(world: World):
         world.moles.append(new_mole)
 
 
-def destroy_moles(world: World):
+def destroy_good_moles(world: World):
     """
-    Gets rid of the moles after an amount of time if they are not shot by the player
+    Gets rid of the good moles after an amount of time if they are not shot by the player
 
     Args:
         world (World): The world instance
     """
-    pass
+    for mole in world.moles:
+        if mole.is_rabbit:
+            delete_mole(world, mole)
 
 
 def create_lives() -> DesignerObject:
@@ -438,6 +440,7 @@ def destroy_cannonballs_outside_window(world: World):
 def check_if_level_passed(world: World):
     """
     Checks if the player hit enough moles to move to the next level
+    If they passed the level, remove the good moles and increase the level by one
 
     Args:
          world (World): The world instance
@@ -445,6 +448,7 @@ def check_if_level_passed(world: World):
     if world.player.moles_hit_in_current_level >= world.level:
         world.player.moles_hit_in_current_level = 0
         world.level += 1
+        destroy_good_moles(world)
 
 
 def cannonball_collides_with_mole(world: World):
@@ -558,7 +562,6 @@ when('starting', create_world)
 # Handles mole spawning
 when('updating', make_moles)
 when('updating', make_ammo)
-when('updating', destroy_moles)
 # Updates player position on holding A or D
 when('typing', on_key_press_move_player)
 when('done typing', on_key_release_stop_player)
