@@ -52,6 +52,7 @@ class World:
     cannon_balls: DesignerObject
     level: int
     levels: DesignerObject
+    scores: DesignerObject
 
 
 def create_world() -> World:
@@ -67,8 +68,8 @@ def create_world() -> World:
     lives = create_lives()
     cannon_balls = count_ammo()
     levels = count_level()
-    return World(ground, player, [], 3, lives, [], [], cannon_balls, 1, levels)
-
+    scores = create_score()
+    return World(ground, player, [], 3, lives, [], [], cannon_balls, 1, levels, scores )
 
 def create_player() -> Player:
     """
@@ -210,7 +211,7 @@ def create_lives() -> DesignerObject:
     Returns:
         DesignerObject: Text which displays how many lives the user has
     """
-    lives = text("red", "Lives: 3", 40, anchor="topleft")
+    lives = text("red", "Lives: 3", 30, anchor="topleft")
     lives.x = 5  # Some margin so that the text doesn't hug the corner
     lives.y = 5
     return lives
@@ -322,7 +323,7 @@ def count_ammo() -> DesignerObject:
         Returns:
             DesignerObject: Text which displays how much ammo the user has
         """
-    cannon_balls = text("black", "Ammo: ", 40, anchor="topright")
+    cannon_balls = text("black", "Ammo: ", 30, anchor="topright")
     cannon_balls.x = 750  # Some margin so that the text doesn't hug the corner
     cannon_balls.y = 5
     return cannon_balls
@@ -460,9 +461,14 @@ def cannonball_collides_with_mole(world: World):
             if colliding(cannonball.ball, mole.mole_img) and cannonball.is_from_player:
                 delete_cannonball(world, cannonball)
                 delete_mole(world, mole)
-                world.player.moles_hit += 1
                 world.player.moles_hit_in_current_level += 1
                 check_if_level_passed(world)
+                if mole.is_mini:
+                    world.player.moles_hit += 3
+                elif mole.is_rabbit:
+                    world.player.moles_hit -= 3
+                else:
+                    world.player.moles_hit += 1
 
 
 def mole_faces_player(world: World):
@@ -513,8 +519,8 @@ def count_level() -> DesignerObject:
         Returns:
             DesignerObject: Text which displays which level the user's on
         """
-    levels = text("black", "Level: ", 40, anchor="midtop")
-    levels.x = 400  # Some margin so that the text doesn't hug the corner
+    levels = text("black", "Level: ", 30, anchor="midtop")
+    levels.x = 300  # Some margin so that the text doesn't hug the corner
     levels.y = 5
     return levels
 
@@ -551,6 +557,27 @@ def loose_lives(world: World):
                 delete_cannonball(world,cannonball)
                 game_over(world)
 
+def create_score() -> DesignerObject:
+    """
+        States what the user's score is at the top of the screen
+
+        Returns:
+            DesignerObject: Text which displays the users score
+        """
+    scores = text("black", "Score: ", 30, anchor="midtop")
+    scores.x = 500  # Some margin so that the text doesn't hug the corner
+    scores.y = 5
+    return scores
+
+
+def update_score(world: World):
+    """
+       Constantly sets the score text equal to the user's score
+
+       Args:
+           world (World): The world instance
+       """
+    world.scores.text = "Score: " + str(world.player.moles_hit)
 
 # Creates the world
 when('starting', create_world)
@@ -580,4 +607,5 @@ when("updating", update_level)
 when("updating", mole_faces_player)
 when("updating", mole_shoots_player)
 when("updating", loose_lives)
+when("updating", update_score)
 start()
