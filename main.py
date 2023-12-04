@@ -476,11 +476,12 @@ def mole_faces_player(world: World):
 
 def mole_shoots_player(world: World):
     for mole in world.moles:
-        random_fire_chance = randint(1, 100) <= world.level
-        if random_fire_chance:
-            mole_img = mole.mole_img
-            cannonball = create_cannonball(mole_img.x, mole_img.y, False, mole_img.angle - 90)
-            world.cannonballs.append(cannonball)
+        if not mole.is_rabbit:
+            random_fire_chance = randint(1, 500) <= world.level
+            if random_fire_chance:
+                mole_img = mole.mole_img
+                cannonball = create_cannonball(mole_img.x, mole_img.y, False, mole_img.angle - 90)
+                world.cannonballs.append(cannonball)
 
 
 def delete_ammo(world: World, ammo: DesignerObject):
