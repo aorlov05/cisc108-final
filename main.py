@@ -465,7 +465,6 @@ def cannonball_collides_with_mole(world: World):
             if colliding(cannonball.ball, mole.mole_img) and cannonball.is_from_player:
                 delete_cannonball(world, cannonball)
                 delete_mole(world, mole)
-                world.player.moles_hit += 1
                 world.player.moles_hit_in_current_level += 1
                 check_if_level_passed(world)
                 if mole.is_mini:
