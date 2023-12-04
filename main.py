@@ -610,7 +610,8 @@ def show_game_over_screen(world: World):
     Args:
         world (World): The world instance
     """
-    text("red", "Game over! You got to level " + str(world.level) + ".", 40)
+    update_lives(world)
+    text("red", "Game over! Your score is " + str(world.player.points) + ".", 40)
 
 
 def create_score() -> DesignerObject:
