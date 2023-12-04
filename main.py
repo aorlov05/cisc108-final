@@ -194,14 +194,16 @@ def make_moles(world: World):
         world.moles.append(new_mole)
 
 
-def destroy_moles(world: World):
+def destroy_good_moles(world: World):
     """
-    Gets rid of the moles after an amount of time if they are not shot by the player
+    Gets rid of the good moles after an amount of time if they are not shot by the player
 
     Args:
         world (World): The world instance
     """
-    pass
+    for mole in world.moles:
+        if mole.is_rabbit:
+            delete_mole(world, mole)
 
 
 def create_lives() -> DesignerObject:
@@ -439,6 +441,7 @@ def destroy_cannonballs_outside_window(world: World):
 def check_if_level_passed(world: World):
     """
     Checks if the player hit enough moles to move to the next level
+    If they passed the level, remove the good moles and increase the level by one
 
     Args:
          world (World): The world instance
@@ -446,6 +449,7 @@ def check_if_level_passed(world: World):
     if world.player.moles_hit_in_current_level >= world.level:
         world.player.moles_hit_in_current_level = 0
         world.level += 1
+        destroy_good_moles(world)
 
 
 def cannonball_collides_with_mole(world: World):
@@ -461,6 +465,7 @@ def cannonball_collides_with_mole(world: World):
             if colliding(cannonball.ball, mole.mole_img) and cannonball.is_from_player:
                 delete_cannonball(world, cannonball)
                 delete_mole(world, mole)
+                world.player.moles_hit += 1
                 world.player.moles_hit_in_current_level += 1
                 check_if_level_passed(world)
                 if mole.is_mini:
@@ -482,11 +487,12 @@ def mole_faces_player(world: World):
 
 def mole_shoots_player(world: World):
     for mole in world.moles:
-        random_fire_chance = randint(1, 100) <= world.level
-        if random_fire_chance:
-            mole_img = mole.mole_img
-            cannonball = create_cannonball(mole_img.x, mole_img.y, False, mole_img.angle - 90)
-            world.cannonballs.append(cannonball)
+        if not mole.is_rabbit:
+            random_fire_chance = randint(1, 500) <= world.level
+            if random_fire_chance:
+                mole_img = mole.mole_img
+                cannonball = create_cannonball(mole_img.x, mole_img.y, False, mole_img.angle - 90)
+                world.cannonballs.append(cannonball)
 
 
 def delete_ammo(world: World, ammo: DesignerObject):
@@ -533,15 +539,14 @@ def update_level(world: World):
     """
     world.levels.text = "Level: " + str(world.level)
 
-def game_over(world: World):
+def game_over(world: World) -> bool:
     """
-    When the player runs out of lives, the game ends
+    Returns if the game is over if the player has no lives left
 
     Args:
         world(World): The world instance
     """
-    if world.lives_count == 0:
-        pause()
+    return world.lives_count == 0
 
 def loose_lives(world: World):
     """
@@ -555,7 +560,16 @@ def loose_lives(world: World):
             if colliding(cannonball.ball, world.player.cannon):
                 world.lives_count -= 1
                 delete_cannonball(world,cannonball)
-                game_over(world)
+
+
+def show_game_over_screen(world: World):
+    """
+    Displays the game over screen with the current level count if they lose all of their lives
+
+    Args:
+        world (World): The world instance
+    """
+    text("red", "Game over! You got to level " + str(world.level) + ".", 40)
 
 def create_score() -> DesignerObject:
     """
@@ -584,7 +598,6 @@ when('starting', create_world)
 # Handles mole spawning
 when('updating', make_moles)
 when('updating', make_ammo)
-when('updating', destroy_moles)
 # Updates player position on holding A or D
 when('typing', on_key_press_move_player)
 when('done typing', on_key_release_stop_player)
@@ -607,5 +620,6 @@ when("updating", update_level)
 when("updating", mole_faces_player)
 when("updating", mole_shoots_player)
 when("updating", loose_lives)
+when(game_over, show_game_over_screen, pause)
 when("updating", update_score)
 start()
