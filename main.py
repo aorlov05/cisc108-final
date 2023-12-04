@@ -9,7 +9,9 @@ HEIGHT_OF_GROUND = 100
 TOP_OF_GROUND_Y = get_height() - HEIGHT_OF_GROUND
 # Represents the highest number of degrees the cannon can rotate before stopping
 MAX_CANNON_ANGLE = 85
+# How fast cannonballs move
 CANNONBALL_SPEED = 5
+# The max amount of ammo the player can hold
 MAX_AMMO = 10
 
 
@@ -21,7 +23,7 @@ class Player:
     right: bool
     rotating_left: bool
     rotating_right: bool
-    moles_hit: int
+    points: int
     moles_hit_in_current_level: int
     ammo_count: int
 
@@ -46,21 +48,21 @@ class World:
     player: Player
     moles: list[Mole]
     lives_count: int
-    lives: DesignerObject
+    lives_text: DesignerObject
     ammo: list[DesignerObject]
     cannonballs: list[Cannonball]
-    cannon_balls: DesignerObject
+    ammo_count_text: DesignerObject
     level: int
-    levels: DesignerObject
-    scores: DesignerObject
+    level_text: DesignerObject
+    score_text: DesignerObject
 
 
 def create_world() -> World:
     """
-    Creates a new world with the initial state of ground and the player
+    Creates a new world with the initial state of ground, player, lives, level count and cannonballs
 
     Returns:
-        A new designer world instance
+        World: A new designer world instance
     """
     ground = Rectangle('green', get_width(), HEIGHT_OF_GROUND, 0,
                        TOP_OF_GROUND_Y, anchor='topleft')
@@ -71,13 +73,14 @@ def create_world() -> World:
     scores = create_score()
     return World(ground, player, [], 3, lives, [], [], cannon_balls, 1, levels, scores )
 
+
 def create_player() -> Player:
     """
     Creates a new player object which consists of a cannon and a wheel
     and sets it on top of the ground.
 
     Returns:
-        A player object representing the user
+        Player: A player object representing the user
     """
     cannon = image("./cannon.png", anchor="midtop")
     wheel = image("./wheel.png", anchor="midbottom")
@@ -88,7 +91,7 @@ def create_player() -> Player:
 
 def get_half_cannon_width(world: World):
     """
-    Returns half the width of the cannon to set its bounds
+    Returns half the width of the cannon to set its screen bounds
 
     Args:
         world (World): The world instance
@@ -110,23 +113,25 @@ def move_player(player: Player, pixels: int):
 
 def update_player_position(world: World):
     """
-    If the player is moving left, move the player position and
+    If the player is moving, move the player position and
     rotate the player wheel towards the corresponding direction
 
     Args:
         world (World): The world instance
     """
-    if world.player.left:
-        move_player(world.player, -5)
-        turn_left(world.player.wheel, 5)
+    player = world.player
+    if player.left:
+        move_player(player, -5)
+        turn_left(player.wheel, 5)
     elif world.player.right:
-        move_player(world.player, 5)
-        turn_right(world.player.wheel, 5)
+        move_player(player, 5)
+        turn_right(player.wheel, 5)
 
 
 def on_key_press_move_player(world: World, key: str):
     """
     Moves the player left when holding a, moves them right when holding d
+    Stops the player from moving left or right when reaching the end of the screen
 
     Args:
         world (World): The world instance
@@ -140,7 +145,8 @@ def on_key_press_move_player(world: World, key: str):
 
 def on_key_release_stop_player(world: World, key: str):
     """
-    Stops moving the player left when holding a, moves them right when holding d
+    Stops moving the player left when letting go of a, 
+    and the same when letting go of d
 
     Args:
         world (World): The world instance
@@ -155,9 +161,10 @@ def on_key_release_stop_player(world: World, key: str):
 def create_mole(world: World, is_mini: bool, is_rabbit: bool) -> DesignerObject:
     """
     Makes the moles that the player is trying to shoot appear randomly
+    Changes the size or image if the mole is a rabbit or mini
 
     Returns:
-        A picture (emoji) of a mole that is the players target
+        DesignerObject: A picture (emoji) of a mole that is the players target
     """
     if is_rabbit:
         new_mole = image("./rabbit.png")
@@ -174,6 +181,8 @@ def create_mole(world: World, is_mini: bool, is_rabbit: bool) -> DesignerObject:
 def make_moles(world: World):
     """
     This determines when a new mole should appear on screen, so they aren't constantly appearing
+    More moles spawn as the level count increases
+    Sets a 10% chance for the mole to be mini or a rabbit
 
     Args:
         world (World): The world instance
@@ -196,7 +205,7 @@ def make_moles(world: World):
 
 def destroy_good_moles(world: World):
     """
-    Gets rid of the good moles after an amount of time if they are not shot by the player
+    Deletes all the good or rabbit moles
 
     Args:
         world (World): The world instance
@@ -208,7 +217,7 @@ def destroy_good_moles(world: World):
 
 def create_lives() -> DesignerObject:
     """
-    The user starts with 3 lives represented by the three heart emojis
+    Creates the lives text at the top of the screen which has an initial state of 3 lives
 
     Returns:
         DesignerObject: Text which displays how many lives the user has
@@ -221,7 +230,7 @@ def create_lives() -> DesignerObject:
 
 def set_player_screen_bounds(world: World):
     """
-    Stops the player from going beyond the bounds of the screen by using the boundaries of the world
+    Stops the player from going beyond the bounds of the screen
 
     Args:
         world (World): The world instance
@@ -239,7 +248,7 @@ def update_lives(world: World):
     Args:
         world (World): The world instance
     """
-    world.lives.text = "Lives: " + str(world.lives_count)
+    world.lives_text.text = "Lives: " + str(world.lives_count)
 
 
 def create_ammo() -> DesignerObject:
@@ -247,9 +256,9 @@ def create_ammo() -> DesignerObject:
     Makes the ammo that the player is shooting appear randomly on the ground
 
     Returns:
-        A picture (emoji) of ammo that the player picks up
+        DesignerObject: A picture (emoji) of ammo that the player picks up
     """
-    new_ammo = image("ammo.png", anchor="midbottom")
+    new_ammo = image("./ammo.png", anchor="midbottom")
     new_ammo.scale_x = .1
     new_ammo.scale_y = .1
     new_ammo.x = randint(1, get_width())
@@ -260,6 +269,7 @@ def create_ammo() -> DesignerObject:
 def make_ammo(world: World):
     """
     This determines when more ammo should appear on screen, so they aren't constantly appearing
+    Allows more ammo to spawn on the ground as the level count increases
 
     Args:
         world (World): The world instance
@@ -318,33 +328,34 @@ def update_player_rotation(world: World):
             player.rotating_right = False
         turn_right(cannon, 5)
 
+
 def count_ammo() -> DesignerObject:
     """
-        The user starts with no ammo represented by the number at the top of the screen
-
-        Returns:
-            DesignerObject: Text which displays how much ammo the user has
-        """
+    Creates the ammo count text at the top of the screen with an initial state of 0 ammo
+    
+    Returns:
+        DesignerObject: Text which displays how much ammo the user has
+    """
     cannon_balls = text("black", "Ammo: ", 30, anchor="topright")
     cannon_balls.x = 750  # Some margin so that the text doesn't hug the corner
     cannon_balls.y = 5
     return cannon_balls
 
+
 def update_ammo(world: World):
     """
     Constantly sets the ammo text equal to the user's amount of ammo
+    If a user runs into ammo and has not reached the ammo limit, increase their ammo by one
 
     Args:
         world (World): The world instance
     """
     player = world.player
     for ball in world.ammo:
-        if colliding(ball, player.cannon):
-            if player.ammo_count < MAX_AMMO:
-                player.ammo_count += 1
-            else:
-                player.ammo_count += 0
-    world.cannon_balls.text = "Ammo: " + str(player.ammo_count)
+        if colliding(ball, player.cannon) and player.ammo_count < MAX_AMMO:
+            player.ammo_count += 1
+    world.ammo_count_text.text = "Ammo: " + str(player.ammo_count)
+
 
 def update_cannonball_position(world: World):
     """
@@ -365,7 +376,7 @@ def update_cannonball_position(world: World):
 
 def create_cannonball(x: int, y: int, is_from_player: bool, angle: int) -> Cannonball:
     """
-    Spawns a cannonball at the player cannon's location
+    Spawns a cannonball at the player cannon's location and sets its initial position and angle
 
     Args:
         x (int): The x initial position of the cannonball
@@ -385,7 +396,7 @@ def create_cannonball(x: int, y: int, is_from_player: bool, angle: int) -> Canno
 def shoot_cannonball(world: World, key: str):
     """
     Spawns a cannonball when the player presses space
-    Checks if they have ammo to shoot, and removes one ammo if they do
+    Checks if they have ammo to shoot and removes one ammo if they do
 
     Args:
         world (World): The world instance to get the player
@@ -454,8 +465,9 @@ def check_if_level_passed(world: World):
 
 def cannonball_collides_with_mole(world: World):
     """
-    Removes both the mole and the cannonball if they collide together.
+    Removes both the mole and the cannonball if they collide together
     Increases the number of moles hit by one
+    Adds or removes respective points to player depending on what type of mole they hit
 
     Args:
         world (World): The world instance to get the cannonballs and the moles
@@ -468,11 +480,11 @@ def cannonball_collides_with_mole(world: World):
                 world.player.moles_hit_in_current_level += 1
                 check_if_level_passed(world)
                 if mole.is_mini:
-                    world.player.moles_hit += 3
+                    world.player.points += 3
                 elif mole.is_rabbit:
-                    world.player.moles_hit -= 3
+                    world.player.points -= 3
                 else:
-                    world.player.moles_hit += 1
+                    world.player.points += 1
 
 
 def mole_faces_player(world: World):
@@ -505,29 +517,32 @@ def delete_ammo(world: World, ammo: DesignerObject):
     world.ammo.remove(ammo)
     destroy(ammo)
 
-def ammo_dissapears(world: World):
-    """
-        Removes the ammo if it collides with the player.
 
-        Args:
-            world (World): The world instance to get the cannonballs and the moles
-        """
+def delete_ammo_on_pickup(world: World):
+    """
+    Removes the ammo if it collides with the player.
+
+    Args:
+        world (World): The world instance to get the cannonballs and the moles
+    """
     player = world.player
     for ammo in world.ammo:
         if colliding(ammo, player.cannon):
             delete_ammo(world, ammo)
 
+
 def count_level() -> DesignerObject:
     """
-        States which level the user's on  at the top of the screen
+    States which level the user's on  at the top of the screen
 
-        Returns:
-            DesignerObject: Text which displays which level the user's on
-        """
+    Returns:
+        DesignerObject: Text which displays which level the user's on
+    """
     levels = text("black", "Level: ", 30, anchor="midtop")
     levels.x = 300  # Some margin so that the text doesn't hug the corner
     levels.y = 5
     return levels
+
 
 def update_level(world: World):
     """
@@ -536,7 +551,8 @@ def update_level(world: World):
     Args:
         world (World): The world instance
     """
-    world.levels.text = "Level: " + str(world.level)
+    world.level_text.text = "Level: " + str(world.level)
+
 
 def game_over(world: World) -> bool:
     """
@@ -547,18 +563,20 @@ def game_over(world: World) -> bool:
     """
     return world.lives_count == 0
 
-def loose_lives(world: World):
+
+def lose_lives(world: World):
     """
-    This function decreases the number of lives that the player
+    Decreases the number of lives that the player
     has when they are hit by a cannonball from the moles
+
     Args:
-        world(World): the world instance
+        world (World): the world instance
     """
     for cannonball in world.cannonballs:
         if not cannonball.is_from_player:
             if colliding(cannonball.ball, world.player.cannon):
                 world.lives_count -= 1
-                delete_cannonball(world,cannonball)
+                delete_cannonball(world, cannonball)
 
 
 def show_game_over_screen(world: World):
@@ -570,13 +588,14 @@ def show_game_over_screen(world: World):
     """
     text("red", "Game over! You got to level " + str(world.level) + ".", 40)
 
+
 def create_score() -> DesignerObject:
     """
-        States what the user's score is at the top of the screen
+    States what the user's score is at the top of the screen
 
-        Returns:
-            DesignerObject: Text which displays the users score
-        """
+    Returns:
+        DesignerObject: Text which displays the users score
+    """
     scores = text("black", "Score: ", 30, anchor="midtop")
     scores.x = 500  # Some margin so that the text doesn't hug the corner
     scores.y = 5
@@ -585,12 +604,13 @@ def create_score() -> DesignerObject:
 
 def update_score(world: World):
     """
-       Constantly sets the score text equal to the user's score
+    Constantly sets the score text equal to the user's score
 
-       Args:
-           world (World): The world instance
-       """
-    world.scores.text = "Score: " + str(world.player.moles_hit)
+    Args:
+        world (World): The world instance
+    """
+    world.score_text.text = "Score: " + str(world.player.points)
+
 
 # Creates the world
 when('starting', create_world)
@@ -614,11 +634,14 @@ when('updating', update_cannonball_position)
 when('updating', destroy_cannonballs_outside_window)
 when('updating', cannonball_collides_with_mole)
 when("updating", update_ammo)
-when("updating", ammo_dissapears)
+when("updating", delete_ammo_on_pickup)
+# Updates level, lives, and points when hitting a shot or getting shot at
 when("updating", update_level)
 when("updating", mole_faces_player)
 when("updating", mole_shoots_player)
-when("updating", loose_lives)
-when(game_over, show_game_over_screen, pause)
+when("updating", lose_lives)
 when("updating", update_score)
+# Handles ending and showing the game over screen
+when(game_over, show_game_over_screen, pause)
+# Starts the game
 start()
